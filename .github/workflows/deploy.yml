@@ -39,7 +39,7 @@ jobs:
           test -f dist/sitemap.xml
           test ! -d dist/server
 
-      - name: Validate deployment credentials
+         - name: Validate deployment credentials
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
@@ -47,7 +47,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
         run: |
-          for name in SSH_HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY SSH_PASSPHRASE SSH_FINGERPRINT; do
+          for name in SSH_HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY SSH_PASSPHRASE; do
             if [ -z "${!name}" ]; then
               echo "::error::Missing repository secret: $name"
               exit 1
