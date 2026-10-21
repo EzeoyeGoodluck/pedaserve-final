@@ -1,0 +1,70 @@
+name: Build and deploy Pedaserve
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pedaserve-test-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24.14.0"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and prerender
+        run: npm run build
+
+      - name: Check deployment files
+        run: |
+          test -f dist/index.html
+          test -f dist/sitemap.xml
+          test ! -d dist/server
+
+      - name: Validate deployment credentials
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
+        run: |
+          for name in SSH_HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY SSH_PASSPHRASE SSH_FINGERPRINT; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing repository secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Upload build to test directory
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          source: "dist"
+          target: "/home/pedaser1/github-deploy-test"
+          strip_components: 1
+          overwrite: true
