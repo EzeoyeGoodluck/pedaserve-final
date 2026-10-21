@@ -1,0 +1,17 @@
+Options -Indexes
+DirectoryIndex index.html
+
+RewriteEngine On
+
+# Preserve certificate-validation paths.
+RewriteRule ^\.well-known/ - [L]
+RewriteRule ^[0-9]+\..+\.cpaneldcv$ - [L]
+
+# Redirect ordinary HTTP requests to HTTPS.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Serve existing files and prerendered page directories directly.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
