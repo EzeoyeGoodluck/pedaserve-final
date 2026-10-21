@@ -46,7 +46,6 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-          SSH_FINGERPRINT: ${{ secrets.SSH_FINGERPRINT }}
         run: |
           for name in SSH_HOST SSH_PORT SSH_USER SSH_PRIVATE_KEY SSH_PASSPHRASE SSH_FINGERPRINT; do
             if [ -z "${!name}" ]; then
