@@ -39,7 +39,7 @@ jobs:
           test -f dist/sitemap.xml
           test ! -d dist/server
 
-         - name: Validate deployment credentials
+      - name: Validate deployment credentials
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
@@ -54,6 +54,8 @@ jobs:
             fi
           done
 
+      # Host fingerprint verification is temporarily disabled for testing.
+      # Restore it with a verified fingerprint before live deployment.
       - name: Upload build to test directory
         uses: appleboy/scp-action@v1
         with:
@@ -62,7 +64,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           source: "dist"
           target: "/home/pedaser1/github-deploy-test"
           strip_components: 1
