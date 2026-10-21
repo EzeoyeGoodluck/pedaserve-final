@@ -65,6 +65,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "dist"
-          target: "/home/pedaser1/github-deploy-test"
+          target: "/home/pedaser1/public_html"
           strip_components: 1
           overwrite: true
